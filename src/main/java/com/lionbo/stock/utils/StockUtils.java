@@ -56,12 +56,24 @@ public class StockUtils
 			e.printStackTrace();
 		}
     	
-    	StockInfo first = res.get(0);
-    	String url = getUrl(first, startYear, startMonth, startDay, endYear, endMonth, endDay);
-    	buildStockPrice(url,first);
-    	
+    	for(StockInfo meta : res)
+    	{
+    		String url = getUrl(meta, startYear, startMonth, startDay, endYear, endMonth, endDay);
+        	buildStockPrice(url,meta);
+    	}
     	return res;
     }
+    
+    /**
+     * 完成build之后，保存在本地数据，以后可以搞个db
+     * @description 以后这个类可以结合build写成一个模板方法，用来build沪深、香港、美国的
+     * @param stockInfos
+     */
+    public static void doSaveStockInfos(List<StockInfo> stockInfos)
+    {
+    	//TODO
+    }
+    
     
     private static String getUrl(StockInfo info,int startYear,int startMonth,int startDay,int endYear,int endMonth,int endDay)
     {
