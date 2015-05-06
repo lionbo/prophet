@@ -65,7 +65,7 @@ public class StockUtils
     }
     
     /**
-     * 完成build之后，保存在本地数据，以后可以搞个db
+     * 完成build之后，保存在本地数据，以后可以搞个db，可以减少网络抓取开销，提升分析速度
      * @description 以后这个类可以结合build写成一个模板方法，用来build沪深、香港、美国的
      * @param stockInfos
      */

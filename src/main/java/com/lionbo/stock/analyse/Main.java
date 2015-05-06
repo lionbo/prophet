@@ -9,18 +9,30 @@ import com.lionbo.stock.utils.StockUtils;
 public class Main {
 
 	public static void main(String[] args) {
-		List<StockInfo> infos = StockUtils.buildStockInfo(2015,4,30,2015,5,5);
+		List<StockInfo> infos = StockUtils.buildStockInfo(2015,5,4,2015,5,6);
+		
+		//以下部分可以抽离为满足条件的策略分析，分为条件、结论、分析三个部分
 		for(StockInfo info :infos)
 		{
 			if(info.getPrices().size()>0)
 			{
-				System.out.println(info.getCode()+":"+info.getName());
 				List<StockPrice> prices = info.getPrices();
-				for(StockPrice price : prices)
+				boolean isCondtionSatisfy = true;
+				for(int i = prices.size()-1;i>=0;i--)
 				{
-					System.out.println(price.getDate()+":"+price.isRise()+":"+price.getOpen()+":"+price.getClose());
+					StockPrice price = prices.get(i);
+					isCondtionSatisfy = isCondtionSatisfy&(!price.isRise());
+					if(!isCondtionSatisfy)
+					{
+						break;
+					}
+				}
+				if(isCondtionSatisfy)
+				{
+					System.out.println(info.getName()+":"+info.getCode());
 				}
 			}
+			
 		}
 	
 	}
