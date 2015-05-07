@@ -103,30 +103,35 @@ public class StockUtils
     	try {
 			CloseableHttpResponse response = client.execute(get);
 			InputStream is = response.getEntity().getContent();
-			String res = IOUtils.toString(is);
-			String[] lines = res.split("\n");
-			for(int i = 1;i<lines.length;i++)
-			{
-				String line = lines[i];
-				StockPrice price = new StockPrice();
-				String[] items = line.split(",");
-				price.setDate(items[0]);
-				price.setOpen(items[1]);
-				price.setHighest(items[2]);
-				price.setLowest(items[3]);
-				price.setClose(items[4]);
-				price.setVolume(items[5]);
-				price.setAdjClose(items[6]);
-				
-				Double open = Double.valueOf(price.getOpen());
-				Double close = Double.valueOf(price.getClose());
-				if(open>close)
+			try{
+				String res = IOUtils.toString(is);
+				String[] lines = res.split("\n");
+				for(int i = 1;i<lines.length;i++)
 				{
-					price.setRise(false);
-				}else{
-					price.setRise(true);
+					String line = lines[i];
+					StockPrice price = new StockPrice();
+					String[] items = line.split(",");
+					price.setDate(items[0]);
+					price.setOpen(items[1]);
+					price.setHighest(items[2]);
+					price.setLowest(items[3]);
+					price.setClose(items[4]);
+					price.setVolume(items[5]);
+					price.setAdjClose(items[6]);
+					
+					Double open = Double.valueOf(price.getOpen());
+					Double close = Double.valueOf(price.getClose());
+					if(open>close)
+					{
+						price.setRise(false);
+					}else{
+						price.setRise(true);
+					}
+					first.getPrices().add(price);
 				}
-				first.getPrices().add(price);
+			}finally{
+				response.close();
+				is.close();
 			}
     	} catch (ClientProtocolException e) {
 			e.printStackTrace();
