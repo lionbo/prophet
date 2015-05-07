@@ -60,6 +60,7 @@ public class StockUtils
     	{
     		String url = getUrl(meta, startYear, startMonth, startDay, endYear, endMonth, endDay);
         	buildStockPrice(url,meta);
+        	System.out.println("finished:"+meta.getName()+":"+meta.getCode());
     	}
     	return res;
     }
@@ -67,6 +68,7 @@ public class StockUtils
     /**
      * 完成build之后，保存在本地数据，以后可以搞个db，可以减少网络抓取开销，提升分析速度
      * @description 以后这个类可以结合build写成一个模板方法，用来build沪深、香港、美国的
+     * 解析太慢，目前大概5秒一条，2000多条，需要近10w秒，因此需要保存数据，今天只抓昨天就好
      * @param stockInfos
      */
     public static void doSaveStockInfos(List<StockInfo> stockInfos)
@@ -106,28 +108,35 @@ public class StockUtils
 			try{
 				String res = IOUtils.toString(is);
 				String[] lines = res.split("\n");
-				for(int i = 1;i<lines.length;i++)
+				
+				if(lines!=null && lines.length>2)
 				{
-					String line = lines[i];
-					StockPrice price = new StockPrice();
-					String[] items = line.split(",");
-					price.setDate(items[0]);
-					price.setOpen(items[1]);
-					price.setHighest(items[2]);
-					price.setLowest(items[3]);
-					price.setClose(items[4]);
-					price.setVolume(items[5]);
-					price.setAdjClose(items[6]);
-					
-					Double open = Double.valueOf(price.getOpen());
-					Double close = Double.valueOf(price.getClose());
-					if(open>close)
+					for(int i = 1;i<lines.length;i++)
 					{
-						price.setRise(false);
-					}else{
-						price.setRise(true);
+						String line = lines[i];
+						StockPrice price = new StockPrice();
+						String[] items = line.split(",");
+						if(items!=null && items.length>6)
+						{
+							price.setDate(items[0]);
+							price.setOpen(items[1]);
+							price.setHighest(items[2]);
+							price.setLowest(items[3]);
+							price.setClose(items[4]);
+							price.setVolume(items[5]);
+							price.setAdjClose(items[6]);
+							
+							Double open = Double.valueOf(price.getOpen());
+							Double close = Double.valueOf(price.getClose());
+							if(open>close)
+							{
+								price.setRise(false);
+							}else{
+								price.setRise(true);
+							}
+							first.getPrices().add(price);
+						}
 					}
-					first.getPrices().add(price);
 				}
 			}finally{
 				response.close();
